@@ -428,7 +428,7 @@ class Worksheet(object):
         )
         return [Cell(self, elem) for elem in feed.findall(_ns('entry'))]
 
-    def get_all_values(self):
+    def get_all_values(self, try_numeric=False):
         """Returns a list of lists containing all cells' values as strings.
         """
         cells = self._fetch_cells()
@@ -437,7 +437,10 @@ class Worksheet(object):
         rows = defaultdict(lambda: defaultdict(str))
         for cell in cells:
             row = rows.setdefault(int(cell.row), defaultdict(str))
-            row[cell.col] = cell.value
+            if try_numeric:
+                row[cell.col] = cell.numeric_value or cell.value
+            else:
+                row[cell.col] = cell.value
 
         # we return a whole rectangular region worth of cells, including
         # empties
